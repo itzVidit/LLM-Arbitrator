@@ -1,14 +1,5 @@
 # ⚖️ LLM Output Arbitration System
 
-[![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://www.python.org/)
-[![LangGraph](https://img.shields.io/badge/LangGraph-Orchestration-purple.svg)](https://langchain-ai.github.io/langgraph/)
-[![Pydantic](https://img.shields.io/badge/Pydantic-v2-red.svg)](https://docs.pydantic.dev/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-REST%20API-green.svg)](https://fastapi.tiangolo.com/)
-[![Streamlit](https://img.shields.io/badge/Streamlit-Dashboard-ff4b4b.svg)](https://streamlit.io/)
-[![Instructor](https://img.shields.io/badge/Instructor-Structured%20Output-blueviolet.svg)](https://python.useinstructor.com/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Cost: $0](https://img.shields.io/badge/API%20Cost-%240-brightgreen.svg)](#-cost)
-
 > A multi-agent AI evaluation pipeline that routes any LLM response through **five independent specialist critics** running on different models and providers, then synthesises their findings into a single confidence-scored verdict with inline annotations and a final APPROVE / REVISE / REJECT recommendation.
 
 <div align="center">
