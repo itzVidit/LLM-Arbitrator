@@ -1,0 +1,44 @@
+# ============================================================
+#  LLM Output Arbitration System — Python Dependencies
+#  Install: pip install -r requirements.txt
+#  Tested with Python 3.14
+# ============================================================
+
+# --- Core framework ---
+langgraph
+langchain
+langchain-core
+
+# --- LLM providers ---
+google-generativeai          # Gemini 2.5 Flash (Accuracy + Adjudicator)
+groq                         # DeepSeek R1 / Llama 4 Scout (Logic)
+openai                       # OpenRouter uses OpenAI-compatible API (Safety)
+ollama                       # Local models: Gemma 3, Phi-4 Mini
+
+# --- Structured outputs ---
+pydantic
+pydantic-settings
+instructor                   # Forces structured JSON from any LLM
+
+# --- API server ---
+fastapi
+uvicorn[standard]
+
+# --- Storage ---
+aiosqlite                    # Async SQLite for arbitration history
+
+# --- Async / utilities ---
+httpx
+python-dotenv
+tenacity                     # Retry logic for flaky LLM calls
+structlog                    # Structured logging
+
+# --- UI dashboard (Phase 4) ---
+streamlit                    # Verdict Explorer web UI
+pandas                       # Batch results table / data manipulation
+plotly                       # Interactive score charts and radar diagrams
+
+# --- Dev / testing ---
+pytest
+pytest-asyncio
+rich                         # Pretty terminal output for demos
