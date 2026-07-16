@@ -550,12 +550,4 @@ All providers used have free tiers. Running this project costs nothing.
 - [ ] Webhook support for async evaluation in production pipelines
 - [ ] Support for additional providers (Anthropic, Mistral, Cohere)
 
----
 
-## 📄 License
-
-MIT License — see [LICENSE](LICENSE) for details.
-
----
-
-*Built as a final-year computer science project exploring multi-agent LLM evaluation, structured output enforcement with Instructor + Pydantic, and parallel DAG orchestration with LangGraph.*
