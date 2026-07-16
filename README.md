@@ -1,5 +1,6 @@
 # ⚖️ LLM Output Arbitration System
 
+
 > A multi-agent AI evaluation pipeline that routes any LLM response through **five independent specialist critics** running on different models and providers, then synthesises their findings into a single confidence-scored verdict with inline annotations and a final APPROVE / REVISE / REJECT recommendation.
 
 <div align="center">
