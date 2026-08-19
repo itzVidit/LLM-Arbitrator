@@ -3,13 +3,6 @@ test_critics.py
 ---------------
 Smoke-test and demo for both Phase 1 (individual critics) and Phase 2
 (full LangGraph orchestration pipeline).
-
-Usage:
-    python test_critics.py              # Full Phase 2 pipeline
-    python test_critics.py --dry-run    # Config check only, no LLM calls
-    python test_critics.py --critic accuracy   # Single Phase 1 critic
-    python test_critics.py --phase 1    # Run individual critics (Phase 1)
-    python test_critics.py --phase 2    # Run full pipeline (Phase 2, default)
 """
 
 from __future__ import annotations
