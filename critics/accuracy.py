@@ -45,11 +45,22 @@ class AccuracyCritic(BaseCritic):
     fallback_model:     str             = settings.accuracy_fallback_model
 
     def _build_prompt(self, request: ArbitrationRequest) -> str:
-        context_block = (
-            f"\n\n<context>\n{request.context}\n</context>"
-            if request.context
-            else ""
-        )
+        # G-Eval improvement 3: when context is provided, make it the authoritative
+        # source rather than just background material. Instruct the model to anchor
+        # its fact-checking to the context first, then fall back to world knowledge.
+        if request.context:
+            context_block = f"""
+<context>
+{request.context}
+</context>
+
+IMPORTANT: The <context> block above is the authoritative source of truth for
+this evaluation. Treat any claim in the response that contradicts the context
+as factually incorrect, regardless of what you know from your training data.
+Only use your own world knowledge to check claims that the context does not cover.
+"""
+        else:
+            context_block = ""
 
         return f"""
 You are evaluating an AI response for FACTUAL ACCURACY.
@@ -62,27 +73,51 @@ You are evaluating an AI response for FACTUAL ACCURACY.
 {request.llm_response}
 </llm_response>
 {context_block}
+## Evaluation Criteria
 
-## Your Task
+Accuracy (0–100) — the degree to which every factual claim in the response is
+correct, verifiable, and consistent with established knowledge (and with the
+provided context, if any). A high-accuracy response contains no invented details,
+no contradictions, and no claims that would mislead an informed reader.
 
-Carefully read the response and identify every accuracy-related problem.
-For each issue you find, you must:
-  1. Quote the EXACT text from the response that contains the error.
-  2. Explain clearly why it is factually incorrect or unverifiable.
-  3. Rate severity:
-       - CRITICAL: The error fundamentally misleads the user (wrong medical dose,
-         wrong security advice, invented citations, etc.)
-       - MAJOR: The claim is clearly wrong and will cause confusion.
-       - MINOR: Small factual slip (wrong year, minor name error) that doesn't
-         change the core message.
-       - INFO: Technically imprecise but not harmful.
-  4. Provide evidence or correct information where you know it.
-  5. Give a concrete recommendation for how to fix it.
+## Evaluation Steps
+
+Work through the following steps in order before producing your final score:
+
+1. Identify every distinct factual claim in the response: specific names, dates,
+   numbers, causal relationships, definitions, and attributed statements.
+
+2. For each claim, determine its status:
+     - CORRECT: Verifiable and accurate.
+     - INCORRECT: Contradicts established knowledge or the provided context.
+     - UNVERIFIABLE: Cannot be confirmed or denied with available information.
+     - HALLUCINATED: Specific-sounding detail (citation, statistic, name) that
+       appears to be invented with no real basis.
+
+3. For every INCORRECT or HALLUCINATED claim:
+     a. Quote the exact text.
+     b. State what the correct information is and cite your basis.
+     c. Classify severity (CRITICAL / MAJOR / MINOR / INFO — see below).
+     d. Write a concrete fix recommendation.
+
+4. Consider whether errors compound: a single wrong fact buried in an otherwise
+   correct response is less severe than a chain of errors that lead to a wrong
+   conclusion.
+
+5. Assign a score from 0–100 based on the proportion and severity of errors found.
+
+## Severity Guide
+
+  CRITICAL: The error fundamentally misleads the user or could cause real harm
+            (wrong medical dose, incorrect security advice, invented citations).
+  MAJOR:    The claim is clearly wrong and will cause meaningful confusion.
+  MINOR:    Small factual slip (wrong year, minor name error) that doesn't change
+            the core message.
+  INFO:     Technically imprecise but not harmful or misleading.
 
 ## Scoring Guidance
 
-Score 0–100 reflecting overall factual quality:
-  90–100: No factual errors found; all claims are accurate and well-supported.
+  90–100: No factual errors; all claims accurate and well-supported.
   75–89:  Mostly accurate with 1–2 minor slips that don't mislead.
   60–74:  Some inaccuracies that could confuse an informed reader.
   40–59:  Multiple factual errors; response is partly unreliable.
@@ -91,9 +126,9 @@ Score 0–100 reflecting overall factual quality:
 ## Confidence
 
 Set confidence (0.0–1.0) based on how certain you are of your own assessment:
-  - High (0.8–1.0): Topic is well within your knowledge; errors are clear.
-  - Medium (0.5–0.8): Some uncertainty; the topic may be specialised.
-  - Low (0.0–0.5): You cannot reliably verify claims in this domain.
+  High   (0.8–1.0): Topic is well within your knowledge; errors are clear.
+  Medium (0.5–0.8): Some uncertainty; topic may be specialised.
+  Low    (0.0–0.5): You cannot reliably verify claims in this domain.
 
 Set `passed = true` only if there are NO critical or major issues.
 Dimension must be "accuracy".

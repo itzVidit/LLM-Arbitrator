@@ -61,34 +61,62 @@ Your job is to check whether the response fully answers everything the prompt as
 </llm_response>
 {context_block}
 
-## Your Task
+## Evaluation Criteria
 
-First, mentally list every distinct question, requirement, or topic the prompt raises.
-Then check whether the response addresses each one adequately.
+Completeness (0–100) — the degree to which the response addresses every distinct
+requirement, question, and sub-topic raised by the original prompt. A complete
+response leaves no explicit requirement unanswered and covers implicit
+requirements to a depth the prompt clearly calls for.
 
-For each gap you find:
-  1. Describe WHAT is missing (use "(general)" as quote if not tied to a specific line).
-  2. Explain why its absence makes the response incomplete.
-  3. Rate severity:
-       - CRITICAL: A core part of the prompt is completely unaddressed.
-       - MAJOR: An important requirement is only partially addressed.
-       - MINOR: A useful-but-optional elaboration is missing.
-       - INFO: The response could be more thorough but is functionally complete.
-  4. Give a recommendation describing what should be added.
+## Evaluation Steps
+
+Work through the following steps in order before producing your final score:
+
+1. Decompose the original prompt into its distinct requirements:
+     - Explicit questions (anything ending in "?")
+     - Explicit tasks ("explain X", "list Y", "compare Z")
+     - Implicit expectations (if the prompt asks how something works, an
+       example is implicitly expected; if it asks for advice, caveats are
+       implicitly expected)
+
+2. For each requirement identified in step 1, check whether the response:
+     - Fully addresses it (clear, complete coverage)
+     - Partially addresses it (mentioned but not explained sufficiently)
+     - Does not address it at all (omitted entirely)
+
+3. For each gap (partial or missing):
+     a. State what specific requirement was not met.
+     b. Use the response text itself (or "(general)" if no quote applies) as the quote.
+     c. Explain why the omission makes the response incomplete.
+     d. Rate severity (CRITICAL / MAJOR / MINOR / INFO — see below).
+     e. Give a recommendation describing what should be added.
+
+4. Check for truncation: does the response appear to end abruptly before
+   finishing a thought or list?
+
+5. Assign a score from 0–100 based on the proportion of requirements met and
+   the depth of coverage.
+
+## Severity Guide
+
+  CRITICAL: A core part of the prompt is completely unaddressed.
+  MAJOR:    An important requirement is only partially addressed.
+  MINOR:    A useful-but-optional elaboration is missing.
+  INFO:     The response could be more thorough but is functionally complete.
 
 ## Scoring Guidance
 
   90–100: Every part of the prompt is addressed thoroughly.
   75–89:  Mostly complete; one minor point could use more depth.
   60–74:  Some sections are shallow or a secondary question is missed.
-  40–59:  Multiple significant gaps; the response only partially helps the user.
+  40–59:  Multiple significant gaps; response only partially helps the user.
   0–39:   The response addresses very little of what was asked.
 
 ## Confidence
 
-  High (0.8–1.0): The prompt's requirements are clear and unambiguous.
+  High   (0.8–1.0): The prompt's requirements are clear and unambiguous.
   Medium (0.5–0.8): Prompt intent is somewhat implicit.
-  Low (0.0–0.5): The prompt is ambiguous and "completeness" is subjective.
+  Low    (0.0–0.5): The prompt is ambiguous and "completeness" is subjective.
 
 Set `passed = true` only if there are NO critical or major issues.
 Dimension must be "completeness".

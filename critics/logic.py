@@ -63,19 +63,49 @@ You are evaluating an AI response for LOGICAL CONSISTENCY and sound REASONING.
 </llm_response>
 {context_block}
 
-## Your Task
+## Evaluation Criteria
 
-Work through the response step by step as a formal reasoner would.
-For each logical problem you find:
-  1. Quote the EXACT text where the logic breaks down.
-  2. Name the specific logical flaw (e.g., "non sequitur", "hasty generalisation").
-  3. Explain why the reasoning is invalid.
-  4. Rate severity:
-       - CRITICAL: The conclusion is completely unsupported; the entire argument fails.
-       - MAJOR: A significant reasoning step is flawed, undermining the conclusion.
-       - MINOR: A small inferential gap that doesn't break the overall argument.
-       - INFO: Imprecise language that could imply a weak argument but isn't wrong.
-  5. Provide corrected or stronger reasoning as a recommendation.
+Logic (0–100) — the degree to which the response's reasoning is valid, coherent,
+and internally consistent. Every conclusion should follow necessarily or
+probabilistically from stated premises, with no logical fallacies, missing
+steps, or self-contradictions.
+
+## Evaluation Steps
+
+Work through the following steps in order before producing your final score:
+
+1. Map the response's argument structure: identify the main claim(s), the
+   supporting premises, and the conclusions drawn from them.
+
+2. For each reasoning step, ask:
+     a. Does the conclusion follow from the premises? (valid inference)
+     b. Are the premises themselves stated as fact or as assumption?
+     c. Is there a named logical fallacy present? (e.g., non sequitur, false
+        dichotomy, ad hominem, circular reasoning, hasty generalisation,
+        appeal to authority, correlation-causation confusion)
+
+3. Identify any missing reasoning steps — places where the argument jumps
+   from premise to conclusion without explanation.
+
+4. Check for internal contradictions: statements within the response that
+   logically cannot both be true.
+
+5. For each flaw found:
+     a. Quote the exact text where the logic breaks down.
+     b. Name the specific logical flaw.
+     c. Explain why the reasoning is invalid.
+     d. Rate severity (CRITICAL / MAJOR / MINOR / INFO — see below).
+     e. Provide corrected or stronger reasoning as a recommendation.
+
+6. Assign a score from 0–100 based on the overall soundness of the argument.
+
+## Severity Guide
+
+  CRITICAL: The conclusion is entirely unsupported; the whole argument fails.
+  MAJOR:    A significant reasoning step is flawed, materially undermining the
+            conclusion.
+  MINOR:    A small inferential gap that doesn't break the overall argument.
+  INFO:     Imprecise language that could imply a weak argument but isn't wrong.
 
 ## Scoring Guidance
 
@@ -87,9 +117,9 @@ For each logical problem you find:
 
 ## Confidence
 
-  High (0.8–1.0): The logical structure is clear and easy to evaluate.
+  High   (0.8–1.0): The logical structure is clear and easy to evaluate.
   Medium (0.5–0.8): The argument is complex or domain-specific.
-  Low (0.0–0.5): Heavy domain knowledge is required to assess the reasoning.
+  Low    (0.0–0.5): Heavy domain knowledge is required to assess the reasoning.
 
 Set `passed = true` only if there are NO critical or major issues.
 Dimension must be "logic".

@@ -63,35 +63,65 @@ and professionalism of the AI response below.
 </llm_response>
 {context_block}
 
-## Style Dimensions to Evaluate
+## Evaluation Criteria
 
-1. GRAMMAR & MECHANICS: Subject-verb agreement, correct word forms, punctuation,
-   spelling, capitalization.
+Style (0–100) — the degree to which the response is well-written, clear,
+grammatically correct, appropriately formatted, and professional in tone.
+A high-style response communicates effectively with no unnecessary friction
+for the reader — it is concise, consistent, and suited to the context.
 
-2. CLARITY: Is each sentence easy to understand on first reading? Are pronouns
-   and references unambiguous?
+## Evaluation Steps
 
-3. CONCISENESS: Is every sentence pulling its weight? Flag padding, redundancy,
-   and filler phrases (e.g., "it is important to note that…").
+Work through the following steps in order before producing your final score:
 
-4. FORMATTING: Does the response use formatting (headers, bullets, code blocks)
-   appropriately for the content type and platform?
+1. Assess grammar and mechanics:
+     - Check subject-verb agreement, correct word forms, punctuation, spelling,
+       and capitalization.
+     - Identify any sentence fragments or run-on sentences.
 
-5. TONE: Is the tone appropriate for a helpful AI assistant? Flag condescension,
-   excessive hedging, or unprofessional language.
+2. Assess clarity:
+     - Read each sentence and ask: "Would a first-time reader understand this
+       immediately?" Flag ambiguous pronoun references, unclear antecedents,
+       and confusing sentence structure.
 
-6. CONSISTENCY: Are technical terms, abbreviations, and style consistent throughout?
+3. Assess conciseness:
+     - Flag padding phrases ("it is important to note that", "as mentioned
+       above", "in conclusion"), unnecessary repetition, and sentences that
+       could be half as long with no loss of meaning.
 
-## For Each Issue Found
+4. Assess formatting:
+     - Is the use of headers, bullet points, numbered lists, and code blocks
+       appropriate for the content type and expected rendering context?
+     - Are formatting choices consistent throughout the response?
 
-  1. Quote the EXACT text with the style problem.
-  2. Explain the specific style issue.
-  3. Rate severity:
-       - CRITICAL: Errors that make the response difficult to understand or embarrassing.
-       - MAJOR: Significant style problems that hurt readability or professionalism.
-       - MINOR: Polish issues — small improvements that would make it better.
-       - INFO: Optional suggestion; purely a matter of preference.
-  4. Provide a corrected version as your recommendation.
+5. Assess tone:
+     - Is the tone appropriate for a helpful AI assistant responding to this
+       specific prompt? Flag condescension, excessive hedging, unprofessional
+       language, or an inappropriately casual/formal register.
+
+6. Assess consistency:
+     - Are technical terms, abbreviations, and capitalization consistent
+       throughout the response?
+
+7. For each issue found:
+     a. Distinguish between a genuine quality problem (reduces clarity or
+        professionalism) and a personal preference (valid style choice the
+        critic simply dislikes). Only flag genuine quality problems.
+     b. Quote the exact text with the issue.
+     c. Explain the specific style problem.
+     d. Rate severity (CRITICAL / MAJOR / MINOR / INFO — see below).
+     e. Provide a corrected version as a recommendation.
+
+8. Assign a score from 0–100 based on the number and severity of genuine
+   style issues found. Do not penalise for stylistic preferences.
+
+## Severity Guide
+
+  CRITICAL: Errors that make the response difficult to understand or
+            embarrassing to share.
+  MAJOR:    Significant style problems that hurt readability or professionalism.
+  MINOR:    Polish issues — small improvements that would make it better.
+  INFO:     Optional suggestion; purely a matter of preference.
 
 ## Scoring Guidance
 
