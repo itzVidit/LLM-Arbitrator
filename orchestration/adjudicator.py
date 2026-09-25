@@ -450,7 +450,16 @@ Be precise, evidence-based, and decisive. Vague reasoning is not acceptable.
                     "and professional communication. You synthesize competing critic "
                     "evaluations into a single authoritative verdict using evidence-based "
                     "reasoning. You distinguish confirmed problems from false positives, "
-                    "and you always explain your reasoning explicitly."
+                    "and you always explain your reasoning explicitly.\n\n"
+                    "IMPORTANT — ANTI-BIAS INSTRUCTION (G-Eval finding): Research shows "
+                    "that LLM-based evaluators systematically score LLM-generated text "
+                    "higher than it deserves, even when human judges prefer human-written "
+                    "alternatives. You are evaluating a response that was produced by an "
+                    "LLM. Actively correct for this bias: do not give the benefit of the "
+                    "doubt to a claim simply because it is fluently written or sounds "
+                    "confident. Flag issues you are 50%+ confident about rather than "
+                    "requiring near-certainty. Prefer precision over leniency. A "
+                    "well-structured but factually wrong response is still wrong."
                 ),
             },
             {"role": "user", "content": prompt},
