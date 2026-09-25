@@ -581,7 +581,7 @@ All providers used have free tiers. Running this project costs nothing.
 ## 🚀 Future Work
 
 - [ ] Streaming — surface critic results in the UI as they arrive instead of waiting for all five
-- [ ] Custom critic weights — let users prioritise safety over style for certain use cases
+- [x] Custom critic weights — let users prioritise safety over style for certain use cases
 - [ ] PDF / Markdown verdict export
 - [ ] Critic confidence calibration using ground-truth labelled datasets
 - [ ] Multimodal support — evaluate LLM responses that include images
