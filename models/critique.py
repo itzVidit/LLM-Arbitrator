@@ -12,7 +12,7 @@ from __future__ import annotations
 
 from enum import Enum
 from typing import Optional
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 
 # ─────────────────────────────────────────────
@@ -262,6 +262,36 @@ class ArbitrationRequest(BaseModel):
         default=None,
         description="Optional caller-supplied ID for tracking / storage."
     )
+    critic_weights: Optional[dict[CriticDimension, float]] = Field(
+        default=None,
+        description=(
+            "Optional per-dimension weights used when computing the overall score. "
+            "Keys must be valid CriticDimension values; values must be floats that "
+            "sum to 1.0 (±0.01 tolerance). Omit to use the system defaults: "
+            "accuracy=0.30, logic=0.25, safety=0.20, completeness=0.15, style=0.10."
+        ),
+    )
+
+    @model_validator(mode="after")
+    def validate_critic_weights(self) -> "ArbitrationRequest":
+        """Ensure provided weights are positive and sum to 1.0."""
+        if self.critic_weights is None:
+            return self
+        weights = self.critic_weights
+        if not weights:
+            raise ValueError("critic_weights must not be empty if provided.")
+        for dim, w in weights.items():
+            if w < 0:
+                raise ValueError(
+                    f"Weight for '{dim.value}' is negative ({w}). All weights must be >= 0."
+                )
+        total = sum(weights.values())
+        if abs(total - 1.0) > 0.01:
+            raise ValueError(
+                f"critic_weights must sum to 1.0 (got {total:.4f}). "
+                "Adjust your weights so they add up to exactly 1.0."
+            )
+        return self
 
 
 

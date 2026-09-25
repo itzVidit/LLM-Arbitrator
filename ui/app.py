@@ -139,6 +139,45 @@ def _render_sidebar() -> str:
             )
 
             st.markdown("<div style='height:0.15rem'></div>", unsafe_allow_html=True)
+
+            # ── Critic Weights ────────────────────────────────────────
+            with st.expander("⚖️ Critic Weights", expanded=False):
+                st.markdown(
+                    '<div style="font-size:0.72rem;color:#64748b;margin-bottom:0.6rem">'
+                    'Adjust how much each critic contributes to the overall score. '
+                    'Weights are normalised automatically to sum to 1.0.'
+                    '</div>',
+                    unsafe_allow_html=True,
+                )
+                w_accuracy     = st.slider("Accuracy",     0, 100, 30, step=5, key="w_accuracy")
+                w_logic        = st.slider("Logic",        0, 100, 25, step=5, key="w_logic")
+                w_safety       = st.slider("Safety",       0, 100, 20, step=5, key="w_safety")
+                w_completeness = st.slider("Completeness", 0, 100, 15, step=5, key="w_completeness")
+                w_style        = st.slider("Style",        0, 100, 10, step=5, key="w_style")
+
+                _raw_total = w_accuracy + w_logic + w_safety + w_completeness + w_style
+                if _raw_total == 0:
+                    st.warning("All weights are 0 — defaults will be used.")
+                    _use_custom_weights = False
+                else:
+                    # Show normalised preview
+                    _norm = {
+                        "accuracy":     round(w_accuracy     / _raw_total, 3),
+                        "logic":        round(w_logic        / _raw_total, 3),
+                        "safety":       round(w_safety       / _raw_total, 3),
+                        "completeness": round(w_completeness / _raw_total, 3),
+                        "style":        round(w_style        / _raw_total, 3),
+                    }
+                    st.markdown(
+                        '<div style="font-size:0.71rem;color:#6366f1;margin-top:0.3rem">'
+                        f'Normalised: acc={_norm["accuracy"]} · log={_norm["logic"]} · '
+                        f'saf={_norm["safety"]} · com={_norm["completeness"]} · '
+                        f'sty={_norm["style"]}'
+                        '</div>',
+                        unsafe_allow_html=True,
+                    )
+                    _use_custom_weights = True
+
             col_run, col_sample = st.columns([3, 2])
             with col_run:
                 run_btn = st.button(
@@ -161,6 +200,26 @@ def _render_sidebar() -> str:
                 st.session_state._last_prompt   = prompt
                 st.session_state._last_response = response
                 st.session_state.run_error      = None
+
+                # Build critic_weights from sliders if customised
+                from models.critique import CriticDimension
+                if _use_custom_weights:
+                    _total = w_accuracy + w_logic + w_safety + w_completeness + w_style
+                    critic_weights = {
+                        CriticDimension.ACCURACY:     round(w_accuracy     / _total, 4),
+                        CriticDimension.LOGIC:        round(w_logic        / _total, 4),
+                        CriticDimension.SAFETY:       round(w_safety       / _total, 4),
+                        CriticDimension.COMPLETENESS: round(w_completeness / _total, 4),
+                        CriticDimension.STYLE:        round(w_style        / _total, 4),
+                    }
+                    # Fix rounding drift so weights sum to exactly 1.0
+                    _diff = 1.0 - sum(critic_weights.values())
+                    critic_weights[CriticDimension.ACCURACY] = round(
+                        critic_weights[CriticDimension.ACCURACY] + _diff, 4
+                    )
+                else:
+                    critic_weights = None
+
                 with st.spinner("Running…"):
                     try:
                         from models.critique import ArbitrationRequest
@@ -169,6 +228,7 @@ def _render_sidebar() -> str:
                             original_prompt=prompt,
                             llm_response=response,
                             session_id=None,
+                            critic_weights=critic_weights,
                         )
                         st.session_state.verdict = run_arbitration_sync(request)
                     except Exception as exc:

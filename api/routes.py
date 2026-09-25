@@ -211,12 +211,29 @@ async def arbitrate(
 ) -> ArbitrateResponse:
     requested_critics = _parse_critics(body.critics)
 
+    # Convert string-keyed weights from the API model to CriticDimension-keyed
+    # weights for the internal ArbitrationRequest. Validation (sum to 1.0) is
+    # handled by ArbitrationRequest's model_validator.
+    critic_weights = None
+    if body.critic_weights:
+        valid_dims = {d.value: d for d in CriticDimension}
+        invalid = [k for k in body.critic_weights if k.lower() not in valid_dims]
+        if invalid:
+            from fastapi import HTTPException, status
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=f"Unknown critic dimension(s) in critic_weights: {invalid}. "
+                       f"Valid values: {sorted(valid_dims)}",
+            )
+        critic_weights = {valid_dims[k.lower()]: v for k, v in body.critic_weights.items()}
+
     pipeline_request = ArbitrationRequest(
         original_prompt=body.original_prompt,
         llm_response=body.llm_response,
         context=body.context,
         session_id=body.session_id or str(uuid.uuid4())[:8],
         requested_critics=requested_critics,
+        critic_weights=critic_weights,
     )
 
     log.info(

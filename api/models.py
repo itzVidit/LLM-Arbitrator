@@ -78,6 +78,17 @@ class ArbitrateRequest(BaseModel):
         ),
         examples=[["accuracy", "safety"]],
     )
+    critic_weights: Optional[dict[str, float]] = Field(
+        default=None,
+        description=(
+            "Optional per-dimension weights for the overall score calculation. "
+            "Keys: accuracy, logic, completeness, safety, style. "
+            "Values must be floats >= 0 that sum to 1.0 (±0.01 tolerance). "
+            "Omit to use system defaults: "
+            "accuracy=0.30, logic=0.25, safety=0.20, completeness=0.15, style=0.10."
+        ),
+        examples=[{"accuracy": 0.40, "logic": 0.25, "safety": 0.20, "completeness": 0.10, "style": 0.05}],
+    )
 
     model_config = {"json_schema_extra": {
         "example": {

@@ -454,11 +454,17 @@ def synthesize_verdict(state: GraphState) -> dict[str, Any]:
         dimension_scores[c.dimension.value]  = adj_scores.get(c.dimension, c.score)
         dimension_passed[c.dimension.value]  = adj_passed.get(c.dimension, c.passed)
 
-    # Weighted overall score
+    # Weighted overall score — use caller-supplied weights if provided,
+    # otherwise fall back to the system defaults in DIMENSION_WEIGHTS.
+    effective_weights: dict[CriticDimension, float] = (
+        request.critic_weights
+        if request.critic_weights is not None
+        else DIMENSION_WEIGHTS
+    )
     total_weight = 0.0
     weighted_sum = 0.0
     for c in critiques:
-        w = DIMENSION_WEIGHTS.get(c.dimension, 0.1)
+        w = effective_weights.get(c.dimension, 0.1)
         weighted_sum += dimension_scores[c.dimension.value] * w
         total_weight += w
     overall_score = round(weighted_sum / total_weight) if total_weight > 0 else 0
