@@ -201,6 +201,10 @@ def detect_disagreement(state: GraphState) -> dict[str, Any]:
       - Any critics give opposite pass/fail
       - A critic's confidence is a statistical outlier (>1.5 sigma from mean)
       - Critical/major issues appear in only one critic (unique signals)
+
+    Also flags a same-model-family bias risk (G-Eval finding): if the adjudicator
+    uses the same model family as one of the critics, their scores may be
+    correlated due to shared generation/evaluation biases.
     """
     critiques: list[Critique] = state.get("critiques", [])
 
@@ -265,6 +269,21 @@ def detect_disagreement(state: GraphState) -> dict[str, Any]:
             if not found_elsewhere:
                 unique_issues.append(f"{dim}: {explanation[:60]}")
 
+    # --- G-Eval anti-bias check: detect same-model-family overlap between a
+    #     critic and the adjudicator. If the accuracy critic and adjudicator share
+    #     the same model family (e.g., both Gemini), their scores may be correlated
+    #     due to shared generation/evaluation biases. Surface this in the summary
+    #     so the adjudicator's anti-bias instruction is contextualised. ---
+    adjudicator_model = settings.adjudicator_model.lower()
+    same_family_critics: list[str] = []
+    for c in critiques:
+        model_lower = c.model_used.lower()
+        # Extract family name: first token before "-" or "/" covers gemini, llama, gemma, qwen…
+        def _family(name: str) -> str:
+            return name.replace("(fallback)", "").strip().split("-")[0].split("/")[-1].split(" ")[0]
+        if _family(model_lower) == _family(adjudicator_model):
+            same_family_critics.append(c.dimension.value)
+
     # --- Final decision ---
     has_disagreement = (
         score_variance >= settings.disagreement_variance_threshold
@@ -280,6 +299,12 @@ def detect_disagreement(state: GraphState) -> dict[str, Any]:
         parts.append(f"confidence outliers: {', '.join(confidence_outliers)}")
     if unique_issues:
         parts.append(f"{len(unique_issues)} unique issue(s) from single critics")
+    if same_family_critics:
+        parts.append(
+            f"same-model-family bias risk: adjudicator ({_family(adjudicator_model)}) "
+            f"shares family with critic(s): {', '.join(same_family_critics)} — "
+            f"anti-bias instruction active in adjudicator"
+        )
 
     summary = (
         ("Critics disagree: " + "; ".join(parts) + ".")
@@ -291,9 +316,10 @@ def detect_disagreement(state: GraphState) -> dict[str, Any]:
     )
 
     log.info(
-        "[detect_disagreement] variance=%.1f  needs_adjudication=%s",
+        "[detect_disagreement] variance=%.1f  needs_adjudication=%s  same_family_bias=%s",
         score_variance,
         has_disagreement,
+        same_family_critics or "none",
     )
 
     report = DisagreementReport(
