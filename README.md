@@ -21,6 +21,7 @@ The LLM Arbitration System uses an **ensemble of five diverse models**, each spe
 
 - [What Problem Does This Solve?](#-what-problem-does-this-solve)
 - [Core Concept: What Is LLM Arbitration?](#-core-concept-what-is-llm-arbitration)
+- [Research Inspiration: G-Eval](#-research-inspiration-g-eval)
 - [The Five Critics](#-the-five-critics)
 - [System Architecture](#-system-architecture)
 - [How Each Component Works](#-how-each-component-works)
@@ -32,6 +33,7 @@ The LLM Arbitration System uses an **ensemble of five diverse models**, each spe
 - [Configuration Reference](#-configuration-reference)
 - [Cost](#-cost)
 - [Tech Stack](#-tech-stack)
+- [References](#-references)
 - [Future Work](#-future-work)
 
 ---
@@ -68,6 +70,34 @@ The pipeline has two routing paths depending on how much the critics agree:
 - **Disagreement path** — score variance exceeds the threshold → route to the adjudicator LLM, which resolves each conflict with dimension-specific evidence-based reasoning, then synthesises
 
 
+
+---
+
+## 🔬 Research Inspiration: G-Eval
+
+This project's critic prompt architecture is directly informed by **G-Eval** (Liu et al., EMNLP 2023), a framework that established LLM-with-chain-of-thought as a significantly more reliable NLG evaluator than traditional metrics like BLEU and ROUGE.
+
+### The three G-Eval findings applied here
+
+**1. Evaluation Steps (Chain-of-Thought) improve correlation with human judgments**
+
+G-Eval shows that asking the LLM to follow explicit, ordered evaluation steps before producing a score improves Spearman correlation with human judgments across every quality dimension tested. Simply asking "rate this 1–5" produces score bunching and low variance. Adding a structured decomposition step — "first identify all factual claims, then classify each, then assess compounding effects, then score" — forces the model to reason before committing.
+
+Every critic in this system uses this structure: **Evaluation Criteria → Evaluation Steps → Scoring Form**. The steps are dimension-specific: the Accuracy critic decomposes claims, the Logic critic maps argument structure, the Completeness critic enumerates prompt requirements, and so on.
+
+**2. LLM evaluators are biased toward LLM-generated text**
+
+G-Eval identifies that GPT-4 systematically scores LLM-generated text higher than human-written text — even when human judges prefer the human text. The paper calls this a potential self-reinforcement risk if evaluation scores are used as training signals.
+
+This system mitigates the bias in two places:
+- The **adjudicator's system prompt** includes an explicit anti-bias instruction: flag issues at 50%+ confidence, do not reward fluency as a proxy for correctness.
+- The **`detect_disagreement` node** checks whether the adjudicator shares a model family with any critic (e.g., both Gemini) and surfaces a bias-risk flag in the `DisagreementReport` for traceability.
+
+**3. Context-anchored evaluation for factual tasks**
+
+G-Eval's consistency benchmarks (QAGS) demonstrate that when a reference/ground-truth document is available, providing it to the evaluator substantially improves factual evaluation accuracy. The **Accuracy critic** in this system treats a provided `context` field as the authoritative source of truth, checking claims against it before falling back to world knowledge.
+
+> **Reference:** Yang Liu, Dan Iter, Yichong Xu, Shuohang Wang, Ruochen Xu, Chenguang Zhu. *G-Eval: NLG Evaluation using GPT-4 with Better Human Alignment.* Proceedings of EMNLP 2023, pages 2511–2522. [ACL Anthology](https://aclanthology.org/2023.emnlp-main.153)
 
 ---
 
@@ -172,6 +202,8 @@ Pipeline continues with the four remaining critiques
 ```
 
 Each critic only needs to implement `_build_prompt(request)`. Everything else — client setup, retry, timeout, fallback, Pydantic coercion — is handled by the base class.
+
+**G-Eval prompt structure:** Every critic prompt follows the three-part structure from G-Eval (Liu et al., EMNLP 2023): **Evaluation Criteria** (formal dimension definition) → **Evaluation Steps** (ordered CoT instructions the model follows before scoring) → **Scoring Guidance** (anchored 0–100 scale). The Evaluation Steps are dimension-specific and force the model to decompose the task before committing to a score, which G-Eval shows significantly improves correlation with human judgments. The Accuracy critic additionally treats a provided `context` block as the authoritative source of truth rather than just background material.
 
 **Ollama special case:** local models (Gemma 3) don't reliably follow Instructor's JSON schema injection. `BaseCritic._ollama_call()` injects a flat, human-readable JSON template directly into the system prompt and parses the response manually before passing it through `Critique.model_validate()`.
 
@@ -537,6 +569,12 @@ All providers used have free tiers. Running this project costs nothing.
 | **pydantic-settings** | Typed `.env` loading with validation |
 | **Tenacity** | Retry logic with exponential backoff on LLM API failures |
 | **Ollama** | Runs Gemma 3 locally — no GPU required |
+
+---
+
+## 📚 References
+
+- Yang Liu, Dan Iter, Yichong Xu, Shuohang Wang, Ruochen Xu, Chenguang Zhu. **G-Eval: NLG Evaluation using GPT-4 with Better Human Alignment.** *Proceedings of the 2023 Conference on Empirical Methods in Natural Language Processing (EMNLP 2023)*, pages 2511–2522. Association for Computational Linguistics. [ACL Anthology](https://aclanthology.org/2023.emnlp-main.153) · [GitHub](https://github.com/nlpyang/geval)
 
 ---
 
