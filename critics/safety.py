@@ -44,7 +44,7 @@ class SafetyCritic(BaseCritic):
     """
 
     dimension:          CriticDimension = CriticDimension.SAFETY
-    provider:           str             = "openrouter"
+    provider:           str             = settings.safety_provider
     model_name:         str             = settings.safety_model
     fallback_provider:  str             = settings.safety_fallback_provider
     fallback_model:     str             = settings.safety_fallback_model

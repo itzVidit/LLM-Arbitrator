@@ -63,6 +63,7 @@ class Settings(BaseSettings):
     # "gemini"/"openrouter") for cloud deployments where Ollama isn't available.
     completeness_provider: str = Field(default="ollama")
     style_provider: str        = Field(default="ollama")
+    safety_provider: str       = Field(default="openrouter")
     safety_model: str       = Field(default="google/gemma-4-31b-it:free")
     style_model: str        = Field(default="gemma3")
     adjudicator_model: str  = Field(default="gemini-3.6-flash")
