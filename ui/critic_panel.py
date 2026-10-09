@@ -211,7 +211,7 @@ def render_critic_panel(verdict: FinalVerdict) -> None:
         unsafe_allow_html=True,
     )
     fig = _radar_chart(critiques)
-    st.plotly_chart(fig, use_container_width=True)  # plotly_chart doesn't support width="stretch" yet
+    st.plotly_chart(fig, width="stretch")  # plotly_chart doesn't support width="stretch" yet
 
     st.markdown("<hr class='section-divider'>", unsafe_allow_html=True)
 

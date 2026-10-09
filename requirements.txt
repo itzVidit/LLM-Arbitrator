@@ -18,7 +18,7 @@ ollama                       # Optional: local models (Gemma 3, Phi-4 Mini) when
 # --- Structured outputs ---
 pydantic
 pydantic-settings
-instructor                   # Forces structured JSON from any LLM
+instructor[google-genai]        # Forces structured JSON from any LLM (extra pulls in jsonref for Gemini)
 
 # --- API server ---
 fastapi

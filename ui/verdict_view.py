@@ -338,7 +338,7 @@ def render_verdict_view(verdict: FinalVerdict) -> None:
         )
         st.markdown("<div style='height:0.3rem'></div>", unsafe_allow_html=True)
         fig = _dimension_bar_chart(verdict.dimension_scores, verdict.dimension_passed)
-        st.plotly_chart(fig, use_container_width=True)  # plotly_chart doesn't support width="stretch" yet
+        st.plotly_chart(fig, width="stretch")  # plotly_chart doesn't support width="stretch" yet
 
     # ── 7. Metadata ───────────────────────────────────────────────────
     meta_parts = []
