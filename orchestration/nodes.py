@@ -391,7 +391,7 @@ def adjudicate(state: GraphState) -> dict[str, Any]:
         f"DIMENSION RESOLUTIONS:\n"
         + "\n".join(
             f"  {r.dimension.value}: score={r.resolved_score}"
-            f"  passed={r.resolved_passed}  reason={r.reasoning}"
+            f"  passed={r.resolved_passed}  reason={r.evidence_reasoning}"
             for r in result.dimension_resolutions
         )
     )

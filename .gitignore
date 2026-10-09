@@ -24,3 +24,4 @@ logs/
 .vscode/
 .idea/
 *.swp
+.streamlit/secrets.toml

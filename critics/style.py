@@ -40,7 +40,7 @@ class StyleCritic(BaseCritic):
     """
 
     dimension:  CriticDimension = CriticDimension.STYLE
-    provider:   str             = "ollama"
+    provider:   str             = settings.style_provider
     model_name: str             = settings.style_model
 
     def _build_prompt(self, request: ArbitrationRequest) -> str:

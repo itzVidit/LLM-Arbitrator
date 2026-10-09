@@ -38,7 +38,7 @@ class CompletenessCritic(BaseCritic):
     """
 
     dimension:  CriticDimension = CriticDimension.COMPLETENESS
-    provider:   str             = "ollama"
+    provider:   str             = settings.completeness_provider
     model_name: str             = settings.completeness_model
 
     def _build_prompt(self, request: ArbitrationRequest) -> str:

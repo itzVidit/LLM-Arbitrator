@@ -81,7 +81,7 @@ def get_groq_client() -> Any:
     """
     try:
         raw_client = Groq(api_key=settings.groq_api_key)
-        client = instructor.from_groq(raw_client, mode=instructor.Mode.TOOLS)
+        client = instructor.from_groq(raw_client, mode=instructor.Mode.JSON_SCHEMA)
         log.debug("Groq client created (model=%s)", settings.logic_model)
         return client
     except Exception as exc:

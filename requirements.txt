@@ -10,10 +10,10 @@ langchain
 langchain-core
 
 # --- LLM providers ---
-google-generativeai          # Gemini 2.5 Flash (Accuracy + Adjudicator)
+google-genai                 # Gemini 2.5 Flash (Accuracy + Adjudicator)
 groq                         # DeepSeek R1 / Llama 4 Scout (Logic)
 openai                       # OpenRouter uses OpenAI-compatible API (Safety)
-ollama                       # Local models: Gemma 3, Phi-4 Mini
+ollama                       # Optional: local models (Gemma 3, Phi-4 Mini) when COMPLETENESS_PROVIDER/STYLE_PROVIDER=ollama
 
 # --- Structured outputs ---
 pydantic

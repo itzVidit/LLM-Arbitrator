@@ -56,12 +56,16 @@ class Settings(BaseSettings):
     )
 
     # ── Model names (overridable without code changes) ───────────────────
-    accuracy_model: str     = Field(default="gemini-2.5-flash")
-    logic_model: str        = Field(default="llama-3.3-70b-versatile")
+    accuracy_model: str     = Field(default="gemini-3.5-flash")
+    logic_model: str        = Field(default="openai/gpt-oss-120b")
     completeness_model: str = Field(default="gemma3")
-    safety_model: str       = Field(default="qwen/qwen3-235b-a22b:free")
+    # Provider for the two "local" critics. Default "ollama"; set to "groq" (or
+    # "gemini"/"openrouter") for cloud deployments where Ollama isn't available.
+    completeness_provider: str = Field(default="ollama")
+    style_provider: str        = Field(default="ollama")
+    safety_model: str       = Field(default="google/gemma-4-31b-it:free")
     style_model: str        = Field(default="gemma3")
-    adjudicator_model: str  = Field(default="gemini-2.5-flash")
+    adjudicator_model: str  = Field(default="gemini-3.5-flash")
 
     # ── App settings ────────────────────────────────────────────────────
     log_level: str = Field(default="INFO")
@@ -73,10 +77,10 @@ class Settings(BaseSettings):
 
     # ── Fallback models ──────────────────────────────────────────────────
     # If a primary provider fails, the critic automatically retries with these
-    accuracy_fallback_model: str    = Field(default="llama-3.3-70b-versatile")
+    accuracy_fallback_model: str    = Field(default="openai/gpt-oss-120b")
     accuracy_fallback_provider: str = Field(default="groq")
 
-    logic_fallback_model: str       = Field(default="llama-3.1-8b-instant")
+    logic_fallback_model: str       = Field(default="openai/gpt-oss-20b")
     logic_fallback_provider: str    = Field(default="groq")
 
     safety_fallback_model: str      = Field(default="gemma3")
