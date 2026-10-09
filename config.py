@@ -56,7 +56,7 @@ class Settings(BaseSettings):
     )
 
     # ── Model names (overridable without code changes) ───────────────────
-    accuracy_model: str     = Field(default="gemini-3.5-flash")
+    accuracy_model: str     = Field(default="gemini-3.6-flash")
     logic_model: str        = Field(default="openai/gpt-oss-120b")
     completeness_model: str = Field(default="gemma3")
     # Provider for the two "local" critics. Default "ollama"; set to "groq" (or
@@ -65,7 +65,7 @@ class Settings(BaseSettings):
     style_provider: str        = Field(default="ollama")
     safety_model: str       = Field(default="google/gemma-4-31b-it:free")
     style_model: str        = Field(default="gemma3")
-    adjudicator_model: str  = Field(default="gemini-3.5-flash")
+    adjudicator_model: str  = Field(default="gemini-3.6-flash")
 
     # ── App settings ────────────────────────────────────────────────────
     log_level: str = Field(default="INFO")
